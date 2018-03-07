@@ -5,9 +5,11 @@ import java.util.Calendar;
 
 public class AirConditioner {
 
-	public AirConditioner(final String city)
+	public AirConditioner(final String city, final Presenter presenter)
 	{
 		this.city = City.fromString(city);
+		this.presenter = presenter;
+		
 		manufacturer = new Manufacturer();
 	}
 
@@ -17,7 +19,7 @@ public class AirConditioner {
 	private boolean isStarted = false;
 	private double temperature = 0.0D;
 	
-	private final Presenter presenter = new DefaultPresenter();
+	private Presenter presenter;
 	
 	private final static int CALENDAR_MONTH_FIELD = 2;
 
@@ -33,6 +35,14 @@ public class AirConditioner {
 		return temperature;
 	}
 	
+	public Presenter getPresenter() {
+		return presenter;
+	}
+
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
+	}
+
 	public void displayTemperature ()
 	{
 		String temperatureToDisplay = "Air Conditioner is stopped, temperature is unkown";
