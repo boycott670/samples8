@@ -5,30 +5,32 @@ import java.util.Calendar;
 
 public class AirConditioner {
 
-	public AirConditioner(final String city, final Presenter presenter)
-	{
-		this.city = City.fromString(city);
-		this.presenter = presenter;
-		
-		manufacturer = new Manufacturer();
-	}
+	private final static int CALENDAR_MONTH_FIELD = 2;
 
 	private final City city;
-	private final Manufacturer manufacturer;
+	private final boolean isStarted;
+	private final double temperature;
+	private final Presenter presenter;
 	
-	private boolean isStarted = false;
-	private double temperature = 0.0D;
+	public AirConditioner(final String city, final Presenter presenter)
+	{
+		this (City.fromString(city), false, presenter, 0.0D);
+	}
 	
-	private Presenter presenter;
-	
-	private final static int CALENDAR_MONTH_FIELD = 2;
+	private AirConditioner (final City city, final boolean isStarted, final Presenter presenter, final double temperature)
+	{
+		this.city = city;
+		this.isStarted = isStarted;
+		this.presenter = presenter;
+		this.temperature = temperature;
+	}
 
 	public City getCity() {
 		return city;
 	}
 
-	public Manufacturer getManufacturer() {
-		return manufacturer;
+	public boolean isStarted() {
+		return isStarted;
 	}
 
 	public double getTemperature() {
@@ -37,10 +39,6 @@ public class AirConditioner {
 	
 	public Presenter getPresenter() {
 		return presenter;
-	}
-
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
 	}
 
 	public void displayTemperature ()
@@ -55,7 +53,7 @@ public class AirConditioner {
 		presenter.displayMessage(temperatureToDisplay);
 	}
 	
-	public void decrease (final double delta)
+	public AirConditioner decrease (final double delta)
 	{
 		if (isStarted)
 		{
@@ -63,7 +61,7 @@ public class AirConditioner {
 			
 			if (currentMonth >= Month.APRIL.getValue() && currentMonth <= Month.SEPTEMBER.getValue())
 			{
-				temperature -= delta;
+				return new AirConditioner(city, isStarted, presenter, temperature - delta);
 			}
 			else
 			{
@@ -74,9 +72,11 @@ public class AirConditioner {
 		{
 			presenter.displayMessage("Air Conditioner is not started, please start it and try again");
 		}
+		
+		return this;
 	}
 	
-	public void increase (final double delta)
+	public AirConditioner increase (final double delta)
 	{
 		if (isStarted)
 		{
@@ -84,7 +84,7 @@ public class AirConditioner {
 			
 			if (currentMonth >= Month.OCTOBER.getValue() || currentMonth <= Month.MARCH.getValue())
 			{
-				temperature += delta;
+				return new AirConditioner(city, isStarted, presenter, temperature + delta);
 			}
 			else
 			{
@@ -95,31 +95,33 @@ public class AirConditioner {
 		{
 			presenter.displayMessage("Air Conditioner is not started, please start it and try again");
 		}
+		
+		return this;
 	}
 	
-	public void start ()
+	public AirConditioner start ()
 	{
 		if (!isStarted)
 		{
-			isStarted = true;
-			this.temperature = city.getTemperature();
+			return new AirConditioner(city, !isStarted, presenter, city.getTemperature());
 		}
 		else
 		{
 			presenter.displayMessage("Air Conditioner is already started, we are doing nothing");
+			return this;
 		}
 	}
 	
-	public void stop ()
+	public AirConditioner stop ()
 	{
 		if (!isStarted)
 		{
 			presenter.displayMessage("Air Conditioner is already stopped, we are doing nothing");
+			return this;
 		}
 		else
 		{
-			isStarted = false;
-			temperature = 0.0D;
+			return new AirConditioner(city, !isStarted, presenter, 0.0D);
 		}
 	}
 }
