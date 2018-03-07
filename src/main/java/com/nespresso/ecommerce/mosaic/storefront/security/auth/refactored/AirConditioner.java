@@ -5,9 +5,9 @@ import java.util.Calendar;
 
 public class AirConditioner {
 
-	public AirConditioner(City city)
+	public AirConditioner(final String city)
 	{
-		this.city = city;
+		this.city = City.fromString(city);
 		manufacturer = new Manufacturer();
 	}
 
