@@ -15,7 +15,9 @@ public class AirConditioner {
 	private final Manufacturer manufacturer;
 	
 	private boolean isStarted = false;
-	private Temperature temperature = Temperature.LOW;
+	private double temperature = 0.0D;
+	
+	private final Presenter presenter = new DefaultPresenter();
 	
 	private final static int CALENDAR_MONTH_FIELD = 2;
 
@@ -27,7 +29,7 @@ public class AirConditioner {
 		return manufacturer;
 	}
 
-	public Temperature getTemperature() {
+	public double getTemperature() {
 		return temperature;
 	}
 	
@@ -37,13 +39,13 @@ public class AirConditioner {
 		
 		if (isStarted)
 		{
-			String.format("Temperature is %s", temperature);
+			temperatureToDisplay = String.format("Temperature is %.0f", temperature);
 		}
 		
-		System.out.println(temperatureToDisplay);
+		presenter.displayMessage(temperatureToDisplay);
 	}
 	
-	public void decrease ()
+	public void decrease (final double delta)
 	{
 		if (isStarted)
 		{
@@ -51,20 +53,20 @@ public class AirConditioner {
 			
 			if (currentMonth >= Month.APRIL.getValue() && currentMonth <= Month.SEPTEMBER.getValue())
 			{
-				temperature = temperature.getPrevious();
+				temperature -= delta;
 			}
 			else
 			{
-				System.out.println("We are in warm season, you cannot decrease more temperature");
+				presenter.displayMessage("We are in warm season, you cannot decrease more temperature");
 			}
 		}
 		else
 		{
-			System.out.println("Air Conditioner is not started, please start it and try again");
+			presenter.displayMessage("Air Conditioner is not started, please start it and try again");
 		}
 	}
 	
-	public void increase ()
+	public void increase (final double delta)
 	{
 		if (isStarted)
 		{
@@ -72,46 +74,29 @@ public class AirConditioner {
 			
 			if (currentMonth >= Month.OCTOBER.getValue() || currentMonth <= Month.MARCH.getValue())
 			{
-				temperature = temperature.getNext();
+				temperature += delta;
 			}
 			else
 			{
-				System.out.println("We are in cold season, you cannot increase more temperature");
+				presenter.displayMessage("We are in cold season, you cannot increase more temperature");
 			}
 		}
 		else
 		{
-			System.out.println("Air Conditioner is not started, please start it and try again");
+			presenter.displayMessage("Air Conditioner is not started, please start it and try again");
 		}
 	}
 	
 	public void start ()
 	{
-		Temperature temperature = Temperature.LOW;
-		
-		switch (city)
-		{
-			case RABAT:
-				temperature = Temperature.MEDIUM;
-				break;
-				
-			case CASABLANCA:
-				temperature = Temperature.ABOVE_MEDIUM;
-				break;
-				
-			case AGADIR:
-				temperature = Temperature.HIGH;
-				break;
-		}
-		
 		if (!isStarted)
 		{
 			isStarted = true;
-			this.temperature = temperature;
+			this.temperature = city.getTemperature();
 		}
 		else
 		{
-			System.out.println("Air Conditioner is already started, we are doing nothing");
+			presenter.displayMessage("Air Conditioner is already started, we are doing nothing");
 		}
 	}
 	
@@ -119,12 +104,12 @@ public class AirConditioner {
 	{
 		if (!isStarted)
 		{
-			System.out.println("Air Conditioner is already stopped, we are doing nothing");
+			presenter.displayMessage("Air Conditioner is already stopped, we are doing nothing");
 		}
 		else
 		{
 			isStarted = false;
-			temperature = Temperature.LOW;
+			temperature = 0.0D;
 		}
 	}
 }
