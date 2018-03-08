@@ -1,4 +1,4 @@
-package com.nespresso.ecommerce.mosaic.storefront.security.auth.refactored;
+package com.nespresso.ecommerce.mosaic.storefront.security.auth.presenters;
 
 public interface Presenter {
 

@@ -1,21 +1,25 @@
 package com.nespresso.ecommerce.mosaic.storefront.security.auth.refactored;
 
+import com.nespresso.ecommerce.mosaic.storefront.security.auth.presenters.Presenter;
+
 public class AirConditionerContext {
 
 	private final String city;
 	private double temperature;
 	private AirConditionerState state;
+	private Presenter presenter;
 	
-	public AirConditionerContext(String city) {
+	public AirConditionerContext(String city, Presenter presenter) {
 		this.city = city;
 		state = new StoppedAirConditionerState();
+		this.presenter = presenter;
 	}
 	
 	public void stop ()
 	{
 		final AirConditionerState previousState = state;
 		
-		state = state.stop();
+		state = state.stop(presenter);
 		
 		if (state != previousState)
 		{
@@ -27,7 +31,7 @@ public class AirConditionerContext {
 	{
 		final AirConditionerState previousState = state;
 		
-		state = state.start();
+		state = state.start(presenter);
 		
 		if (state != previousState)
 		{
@@ -54,17 +58,25 @@ public class AirConditionerContext {
 	
 	public void displayTemperature ()
 	{
-		state.displayTemperature(temperature);
+		state.displayTemperature(temperature, presenter);
 	}
 	
 	public void increase (final double increment)
 	{
-		temperature = state.increase(temperature, increment);
+		temperature = state.increase(temperature, increment, presenter);
 	}
 	
 	public void decrease (final double increment)
 	{
-		temperature = state.decrease(temperature, increment);
+		temperature = state.decrease(temperature, increment, presenter);
+	}
+
+	Presenter getPresenter() {
+		return presenter;
+	}
+
+	void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
 	}
 	
 }

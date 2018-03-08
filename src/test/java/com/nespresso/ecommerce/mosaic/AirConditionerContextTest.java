@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.nespresso.ecommerce.mosaic.storefront.security.auth.presenters.DefaultPresenter;
 import com.nespresso.ecommerce.mosaic.storefront.security.auth.refactored.AirConditionerContext;
 
 public class AirConditionerContextTest {
@@ -11,7 +12,7 @@ public class AirConditionerContextTest {
 	@Test
 	public void test ()
 	{
-		final AirConditionerContext airConditioner = new AirConditionerContext("RABAT");
+		final AirConditionerContext airConditioner = new AirConditionerContext("RABAT", new DefaultPresenter());
 		
 		airConditioner.displayTemperature();
 		
