@@ -1,115 +1,97 @@
 package com.nespresso.ecommerce.mosaic.storefront.security.auth.refactored;
 
-import java.time.Month;
-import java.util.Calendar;
+import com.nespresso.ecommerce.mosaic.storefront.security.auth.presenters.Presenter;
 
 public class AirConditioner {
 
-	public AirConditioner(City city)
+	private final City city;
+	private final double temperature;
+	private final AirConditionerState state;
+	private final Presenter presenter;
+	
+	public AirConditioner(String city, Presenter presenter) {
+		this (City.valueOf(city), presenter, 0, new StoppedAirConditionerState());
+	}
+	
+	private AirConditioner (City city, Presenter presenter, double temperature, AirConditionerState state)
 	{
 		this.city = city;
-		manufacturer = new Manufacturer();
+		this.presenter = presenter;
+		this.state = state;
+		this.temperature = temperature;
 	}
-
-	private final City city;
-	private final Manufacturer manufacturer;
 	
-	private boolean isStarted = false;
-	private double temperature = 0.0D;
+	public AirConditioner stop ()
+	{
+		final AirConditionerState previousState = state;
+		
+		final AirConditionerState nextState = state.stop(presenter);
+		
+		if (nextState != previousState)
+		{
+			return new AirConditioner(city, presenter, temperature, nextState);
+		}
+		else
+		{
+			return this;
+		}
+	}
 	
-	private final Presenter presenter = new DefaultPresenter();
-	
-	private final static int CALENDAR_MONTH_FIELD = 2;
+	public AirConditioner start ()
+	{
+		final AirConditionerState previousState = state;
+		
+		final AirConditionerState nextState = state.start(presenter);
+		
+		if (nextState != previousState)
+		{
+			return new AirConditioner(city, presenter, city.getTemperature(), nextState);
+		}
+		else
+		{
+			return this;
+		}
+	}
 
 	public City getCity() {
 		return city;
 	}
-
-	public Manufacturer getManufacturer() {
-		return manufacturer;
-	}
-
-	public double getTemperature() {
-		return temperature;
+	
+	public Presenter getPresenter() {
+		return presenter;
 	}
 	
 	public void displayTemperature ()
 	{
-		String temperatureToDisplay = "Air Conditioner is stopped, temperature is unkown";
+		state.displayTemperature(temperature, presenter);
+	}
+	
+	public AirConditioner increase (final double increment)
+	{
+		final double newTemperature = state.increase(temperature, increment, presenter);
 		
-		if (isStarted)
+		if (temperature == newTemperature)
 		{
-			temperatureToDisplay = String.format("Temperature is %.0f", temperature);
+			return this;
 		}
+		else
+		{
+			return new AirConditioner(city, presenter, newTemperature, state);
+		}
+	}
+	
+	public AirConditioner decrease (final double increment)
+	{
+		final double newTemperature = state.decrease(temperature, increment, presenter);
 		
-		presenter.displayMessage(temperatureToDisplay);
-	}
-	
-	public void decrease (final double delta)
-	{
-		if (isStarted)
+		if (temperature == newTemperature)
 		{
-			final int currentMonth = Calendar.getInstance().get(CALENDAR_MONTH_FIELD);
-			
-			if (currentMonth >= Month.APRIL.getValue() && currentMonth <= Month.SEPTEMBER.getValue())
-			{
-				temperature -= delta;
-			}
-			else
-			{
-				presenter.displayMessage("We are in warm season, you cannot decrease more temperature");
-			}
+			return this;
 		}
 		else
 		{
-			presenter.displayMessage("Air Conditioner is not started, please start it and try again");
+			return new AirConditioner(city, presenter, newTemperature, state);
 		}
 	}
 	
-	public void increase (final double delta)
-	{
-		if (isStarted)
-		{
-			final int currentMonth = Calendar.getInstance().get(CALENDAR_MONTH_FIELD);
-			
-			if (currentMonth >= Month.OCTOBER.getValue() || currentMonth <= Month.MARCH.getValue())
-			{
-				temperature += delta;
-			}
-			else
-			{
-				presenter.displayMessage("We are in cold season, you cannot increase more temperature");
-			}
-		}
-		else
-		{
-			presenter.displayMessage("Air Conditioner is not started, please start it and try again");
-		}
-	}
-	
-	public void start ()
-	{
-		if (!isStarted)
-		{
-			isStarted = true;
-			this.temperature = city.getTemperature();
-		}
-		else
-		{
-			presenter.displayMessage("Air Conditioner is already started, we are doing nothing");
-		}
-	}
-	
-	public void stop ()
-	{
-		if (!isStarted)
-		{
-			presenter.displayMessage("Air Conditioner is already stopped, we are doing nothing");
-		}
-		else
-		{
-			isStarted = false;
-			temperature = 0.0D;
-		}
-	}
 }
